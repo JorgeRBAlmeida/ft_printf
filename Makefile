@@ -10,8 +10,6 @@ CC		= cc
 
 AR		= ar rcs
 
-ARB		= ar qs
-
 CFLAGS	= -Wall -Wextra -Werror
 
 .c.o:
@@ -30,6 +28,4 @@ fclean:		clean
 
 re:			fclean all
 
-test:		${CC} ${CFLAGS} printf.out -L. -lftprintf
-
-.PHONY:		all clean fclean re test
+.PHONY:		all clean fclean re
