@@ -6,7 +6,7 @@
 /*   By: joalmeid <joalmeid@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 15:10:15 by joalmeid          #+#    #+#             */
-/*   Updated: 2022/06/22 00:48:24 by joalmeid         ###   ########.fr       */
+/*   Updated: 2022/06/22 01:19:30 by joalmeid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ static int	print_param(char c, va_list params);
 
 size_t	ft_strlen(const char *src);
 char	*ft_strchr(const char *s, int c);
-void	ft_putstr_fd(char *s, int fd);
-void	ft_putchar_fd(char c, int fd);
-void	ft_putnbr_fd(int n, int fd);
+int	ft_putstr_fd(char *s, int fd);
+int	ft_putchar_fd(char c, int fd);
+int	ft_putnbase_fd(int n, int fd, int base, char x);
 
 int	ft_printf(const char *src, ...)
 {
@@ -61,31 +61,39 @@ char	*ft_strchr(const char *s, int c)
 	return ((char *) s);
 }
 
-void	ft_putchar_fd(char c, int fd)
+int	ft_putchar_fd(char c, int fd)
 {
 		write(fd, &c, 1);
+		return (1);
 }
 
-void	ft_putnbr_fd(int n, int fd)
+int	ft_putnbase_fd(int n, int fd, int base, char x)
 {
 	long	nbr;
+	int		len;
 
 	nbr = n;
+	len = 1;
 	else if (nbr < 0)
 	{
 		nbr = -nbr;
-		ft_putchar_fd('-', fd);
+		len += ft_putchar_fd('-', fd);
 	}
 	if (nbr >= 0 && nbr <= 9)
-		ft_putchar_fd((nbr + '0'), fd);
+		len += ft_putchar_fd((nbr + '0'), fd);
+	if ((base == 16) && x == 'x' && (nbr >= 10 && nbr <= 15))
+		len += ft_putchar_fd((nbr + 87), fd);
+	if ((base == 16) && x == 'X' && (nbr >= 10 && nbr <= 15))
+		len += ft_putchar_fd((nbr + 55), fd);
 	else
 	{
-		ft_putnbr_fd((nbr / 10), fd);
-		ft_putnbr_fd((nbr % 10), fd);
+		ft_putnbr_fd((nbr / base), fd, base, x);
+		ft_putnbr_fd((nbr % base), fd, base, x);
 	}
+	return (len);
 }
 
-void	ft_putstr_fd(char *s, int fd)
+int	ft_putstr_fd(char *s, int fd)
 {
 	size_t	len;
 
@@ -94,6 +102,7 @@ void	ft_putstr_fd(char *s, int fd)
 		return ;
 	len = ft_strlen(s);
 	write(fd, s, len);
+	return (len);
 }
 
 /* STATICS */
@@ -140,19 +149,23 @@ static int	print(const char *src, va_list params)
 static int	print_param(char c, va_list params)
 {
 	if(c == '%')
+	{
 		write(1, "%", 1);
+		return (1);
+	}
 	if(c == 's')
-		ft_putstr_fd(va_arg(params, char *), 1);
+		return (ft_putstr_fd(va_arg(params, char *), 1));
 	if(c == 'p')
-		/* The void * pointer argument has to be printed in hexadecimal format. */
+		return (ft_putnbase_fd(va_arg(params, int), 1, 16, 'x'));
 	if(c == 'd' || c == 'i')
-		ft_putnbr_fd(va_arg(params, int), 1);
+		return (ft_putnbase_fd(va_arg(params, int), 1, 10, 'x'));
 	if(c == 'u')
-		ft_putnbr_fd(va_arg(params, unsigned int), 1);
+		return (ft_putnbase_fd(va_arg(params, unsigned int), 1, 10, 'x'));
 	if(c == 'x')
-		/* Prints a number in hexadecimal (base 16) lowercase format */
+		return (ft_putnbase_fd(va_arg(params, int), 1, 16, 'x'));
 	if(c == 'X')
-		/* Prints a number in hexadecimal (base 16) uppercase format. */
+		return (ft_putnbase_fd(va_arg(params, int), 1, 16, 'X'));
+	return (0);
 }
 
 /* int	ft_isascii(int c)
