@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joalmeid <joalmeid@student.42.fr>          +#+  +:+       +#+        */
+/*   By: joalmeid <joalmeid@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 15:10:15 by joalmeid          #+#    #+#             */
-/*   Updated: 2022/06/22 17:52:38 by joalmeid         ###   ########.fr       */
+/*   Updated: 2022/06/23 08:40:37 by joalmeid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,8 @@ size_t		ft_strlen(const char *src);
 char		*ft_strchr(const char *s, int c);
 int			ft_putstr_fd(char *s, int fd);
 int			ft_putchar_fd(char c, int fd);
-static int	putnbase_len(long n, int base);
-int			ft_putnbase_fd(long nbr, int fd, int base, char x);
-int			ft_putnbasep_fd(unsigned long *nbr, int fd, int base, char x);
+static int	putnbase_len(unsigned long n, int base);
+int			ft_putnbase_fd(long long nbr, int fd, int base, char x);
 void		*ft_calloc(size_t num, size_t size);
 void		*ft_memcpy(void *dst, const void *src, size_t n);
 void		ft_bzero(void *s, size_t n);
@@ -72,45 +71,13 @@ int	ft_putchar_fd(char c, int fd)
 		return (1);
 }
 
-int	ft_putnbasep_fd(unsigned long *nbr, int fd, int base, char x)
+int	ft_putnbase_fd(long long nbr, int fd, int base, char x)
 {
-	int		len;
+	int				len;
 
-	len = putnbase_len(*nbr, base);
-	if (base == 16)
-	{
-		write(fd, "0", 1);
-		write(fd, &x, 1);
-	}
-	if (*nbr < 0)
-	{
-		*nbr = -*nbr;
-		ft_putchar_fd('-', fd);
-	}
-	if (*nbr >= 0 && *nbr <= 9)
-		ft_putchar_fd((*nbr + '0'), fd);
-	else if ((base == 16) && (x == 'x') && (*nbr >= 10 && *nbr <= 15))
-		ft_putchar_fd((*nbr + 87), fd);
-	else if ((base == 16) && (x == 'X') && (*nbr >= 10 && *nbr <= 15))
-		ft_putchar_fd((*nbr + 55), fd);
-	else
-	{
-		ft_putnbase_fd((*nbr / base), fd, base, x);
-		ft_putnbase_fd((*nbr % base), fd, base, x);
-	}
-	return (len);
-}
-
-int	ft_putnbase_fd(long nbr, int fd, int base, char x)
-{
-	int		len;
-
+	if (base != 10)
+		nbr = (unsigned long)nbr;
 	len = putnbase_len(nbr, base);
-	if (base == 16)
-	{
-		write(fd, "0", 1);
-		write(fd, &x, 1);
-	}
 	if (nbr < 0)
 	{
 		nbr = -nbr;
@@ -130,7 +97,7 @@ int	ft_putnbase_fd(long nbr, int fd, int base, char x)
 	return (len);
 }
 
-static int	putnbase_len(long n, int base)
+static int	putnbase_len(long long n, int base)
 {
 	int	len;
 
@@ -140,11 +107,9 @@ static int	putnbase_len(long n, int base)
 		len ++;
 		n = -n;
 	}
-	else if (base == 16)
-		len += 2;
-	while (n > 9)
+	while (n > (base - 1))
 	{
-		n = n / 10;
+		n = n / base;
 		len ++;
 	}
 	return (len);
@@ -255,10 +220,7 @@ CHECK• %u Prints an unsigned decimal (base 10) number.
 static int	print_param(char c, va_list params)
 {
 	if(c == '%')
-	{
-		write(1, "%", 1);
-		return (- 1);
-	}
+		return (write(1, "%", 1) - 1);
 	else if(c == 'c')
 		return (ft_putchar_fd((va_arg(params, int)), 1) - 2);
 	else if(c == 's')
@@ -267,12 +229,15 @@ static int	print_param(char c, va_list params)
 		return (ft_putnbase_fd(va_arg(params, int), 1, 10, 'x') - 2);
 	else if(c == 'u')
 		return (ft_putnbase_fd(va_arg(params, unsigned int), 1, 10, 'x') - 2);
-	else if(c == 'p')
-		return (ft_putnbase_fd(va_arg(params, unsigned int), 1, 16, 'x') - 2);
 	else if(c == 'x')
 		return (ft_putnbase_fd(va_arg(params, unsigned int), 1, 16, 'x') - 2);
 	else if(c == 'X')
 		return (ft_putnbase_fd(va_arg(params, unsigned int), 1, 16, 'X') - 2);
+	else if(c == 'p')
+	{
+		write(1, "0x", 2);
+		return (ft_putnbase_fd(va_arg(params, unsigned long), 1, 16, 'x'));
+	}
 	return (0);
 }
 
@@ -308,10 +273,15 @@ int	main(void)
 	}
 } */
 
-/* int	main(void)
+int	main(void)
 {
-	//int	t = 10;
+	//int	t = -10000;
 	//char str[] = "hello!";
-	ft_printf("\nreturn printf:\t|%i|\n", ft_printf(" %%% "));
+	// ft_printf("\nreturn ft_printf:\t|%i|\n", ft_printf("'%%%'"));
+	// printf("\nreturn printf:\t|%i|\n", printf("'%%%'"));
+	void *p;
+	ft_printf("\nreturn ft_printf:\t|%i|\n", ft_printf("%p", p));
+	printf("\nreturn printf:\t|%i|\n", printf("%p", p));
+
 	//printf("%d", ft_printf("test%s", str));
-} */
+}
