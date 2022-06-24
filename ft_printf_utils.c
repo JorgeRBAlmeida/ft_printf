@@ -3,48 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joalmeid <joalmeid@student.42.rio>         +#+  +:+       +#+        */
+/*   By: joalmeid <joalmeid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 09:10:35 by joalmeid          #+#    #+#             */
-/*   Updated: 2022/06/24 09:32:30 by joalmeid         ###   ########.fr       */
+/*   Updated: 2022/06/24 13:04:54 by joalmeid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-size_t	ft_strlen(const char *src)
-{
-	size_t	index;
-
-	index = 0;
-	while (src && src[index])
-	{
-		index ++;
-	}
-	return (index);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	while (*s != (char)c)
-	{
-		if (*s == '\0' && (char)c != *s)
-			return (0);
-		s++;
-	}
-	return ((char *) s);
-}
+static int	putnbase_u_len(unsigned long n, unsigned long base);
+static int	putnbr_len(long n);
 
 int	ft_putchar_len(char c, int fd)
 {
-		write(fd, &c, 1);
-		return (1);
+	write(fd, &c, 1);
+	return (1);
 }
 
 int	ft_putnbr_len(long n, int fd)
 {
 	int	len;
-	
+
 	len = putnbr_len(n);
 	if (n < 0)
 	{
@@ -80,7 +60,7 @@ int	ft_putnbase_u(unsigned long nbr, int fd, int base, char type)
 	return (len);
 }
 
-int	putnbase_u_len(unsigned long n, unsigned long base)
+static int	putnbase_u_len(unsigned long n, unsigned long base)
 {
 	int	len;
 
@@ -93,7 +73,7 @@ int	putnbase_u_len(unsigned long n, unsigned long base)
 	return (len);
 }
 
-int	putnbr_len(long n)
+static int	putnbr_len(long n)
 {
 	int	len;
 
@@ -108,20 +88,5 @@ int	putnbr_len(long n)
 		n = n / 10;
 		len ++;
 	}
-	return (len);
-}
-
-int	ft_putstr_len(char *s, int fd)
-{
-	size_t	len;
-
-	len = 0;
-	if (s == NULL)
-	{
-		write(fd, "(null)", 6);
-		return (6);
-	}
-	len = ft_strlen(s);
-	write(fd, s, len);
 	return (len);
 }
