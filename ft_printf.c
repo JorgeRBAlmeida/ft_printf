@@ -6,7 +6,7 @@
 /*   By: joalmeid <joalmeid@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 15:10:15 by joalmeid          #+#    #+#             */
-/*   Updated: 2022/06/24 09:38:47 by joalmeid         ###   ########.fr       */
+/*   Updated: 2022/06/24 10:27:37 by joalmeid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ int	ft_printf(const char *src, ...)
 			index ++;
 			if (ft_strchr("cspdiuxX%", src[index]))
 				printed += print_arg(src[index], args);
+			else
+				return (-1);
 		}
 		else
 			printed += ft_putchar_len(src[index], 1);
@@ -64,21 +66,21 @@ static int	print_arg(char c, va_list args)
 	return (0);
 }
 
-#include <limits.h>
+/* #include <limits.h>
 #include <stdio.h>
 int	main(void)
 {
 	//int	t = -10000;
 	//char str[] = "hello!";
-	// ft_printf("\nreturn ft_printf:\t|%i|\n", ft_printf("'%%%'"));
-	// printf("\nreturn printf:\t|%i|\n", printf("'%%%'"));
+	ft_printf("\nreturn ft_printf:\t|%i|\n", ft_printf("bbbbbbbbb'%%%'"));
+	printf("\nreturn printf:\t|%i|\n", printf("bbbbbbbbb'%%%'"));
 	//void *p;
-	ft_printf("\nreturn ft_printf:\t|%i|\n\n", ft_printf("%p%p", ULONG_MAX, -ULONG_MAX));
-	printf("\nreturn printf:\t|%i|\n", printf("%p%p", (long long *)ULONG_MAX, (long long *)-ULONG_MAX));
+	//ft_printf("\nreturn ft_printf:\t|%i|\n\n", ft_printf("%p%p", ULONG_MAX, -ULONG_MAX));
+	//printf("\nreturn printf:\t|%i|\n", printf("%p%p", (long long *)ULONG_MAX, (long long *)-ULONG_MAX));
 
 	//printf("%d", ft_printf("test%s", str));
 	 
-}
+} */
 
 /* int	ft_isascii(int c)
 {
